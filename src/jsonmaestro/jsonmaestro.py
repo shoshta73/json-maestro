@@ -3,7 +3,10 @@ import sys
 import re
 from typing import Union, List, Dict, Any, cast, TypeVar, Set
 
+from internal import log
+
 T = TypeVar('T', bound=Union[Dict[str, Any], List[Any], Any])
+
 
 def load_jsonc(file_path: str) -> Dict[str, Any]:
 	"""Load JSONC from a file, skipping comments starting with // and handling control characters."""
@@ -21,30 +24,39 @@ def load_jsonc(file_path: str) -> Dict[str, Any]:
 			return json.loads(content)
 
 	except json.JSONDecodeError as e:
-		print(f"Error: Invalid JSON format in the file. Error details: {str(e)}")
-		print("Please check the contents of the file.")
+		log.critical(
+		    f"Error: Invalid JSON format in the file. Error details: {str(e)}\nPlease check the contents of the file."
+		)
+
 		sys.exit(1)
 	except ValueError as e:
-		print(f"Error: Unexpected content in the file. Error details: {str(e)}")
-		print("Please check the contents of the file.")
+		log.critical(
+		    f"Error: Unexpected content in the file. Error details: {str(e)}\nPlease check the contents of the file."
+		)
 		sys.exit(1)
 
-def load_json(file_path: str)-> Dict[str, Any]:
+
+def load_json(file_path: str) -> Dict[str, Any]:
 	"""Load json format compliant file."""
 	try:
 		with open(file_path, 'r', encoding='utf-8') as file:
 			content = file.read()
 			return json.loads(content)
 	except json.JSONDecodeError as e:
-		print(f"Error: Invalid JSON format in the file. Error details: {str(e)}")
-		print("Please check the contents of the file.")
+		log.critical(
+		    f"Error: Invalid JSON format in the file. Error details: {str(e)}\nPlease check the contents of the file."
+		)
 		sys.exit(1)
 	except ValueError as e:
-		print(f"Error: Unexpected content in the file. Error details: {str(e)}")
-		print("Please check the contents of the file.")
+		log.critical(
+		    f"Error: Unexpected content in the file. Error details: {str(e)}\nPlease check the contents of the file."
+		)
 		sys.exit(1)
 
-def remove_comments(obj: Union[Dict[str, Any], List[Any], Any]) -> Union[Dict[str, Any], List[Any], Any]:
+
+def remove_comments(
+    obj: Union[Dict[str, Any], List[Any], Any]
+) -> Union[Dict[str, Any], List[Any], Any]:
 	"""Remove comments from the object."""
 	if isinstance(obj, dict):
 		return {k: remove_comments(v) for k, v in obj.items()}
@@ -53,7 +65,10 @@ def remove_comments(obj: Union[Dict[str, Any], List[Any], Any]) -> Union[Dict[st
 	else:
 		return obj
 
-def remove_duplicate_keys(obj: Union[Dict[str, Any], List[Any], Any]) -> Union[Dict[str, Any], List[Any], Any]:
+
+def remove_duplicate_keys(
+    obj: Union[Dict[str, Any], List[Any], Any]
+) -> Union[Dict[str, Any], List[Any], Any]:
 	"""
 	Recursively remove duplicate keys from a nested object.
 
@@ -76,6 +91,7 @@ def remove_duplicate_keys(obj: Union[Dict[str, Any], List[Any], Any]) -> Union[D
 	else:
 		return obj
 
+
 def add_schema_keys(obj: T) -> T:
 	"""
 	Add schema-related keys to the object.
@@ -94,13 +110,14 @@ def add_schema_keys(obj: T) -> T:
 			if isinstance(value, list) and key.startswith("json.schemas"):
 				schema_list: List[Dict[str, Any]] = value
 				for schema_item in schema_list:
-						schema_item.setdefault("fileMatch", [])
-						schema_item.setdefault("url", "")
+					schema_item.setdefault("fileMatch", [])
+					schema_item.setdefault("url", "")
 	elif isinstance(obj, list):
 		obj_list: List[Any] = obj
 		for item in obj_list:
 			add_schema_keys(item)
 	return obj
+
 
 def sort_json_keys(obj: T, reverse: bool = False) -> T:
 	"""
@@ -114,7 +131,11 @@ def sort_json_keys(obj: T, reverse: bool = False) -> T:
 	The processed object with sorted keys.
 	"""
 	if isinstance(obj, dict):
-		sorted_dict = {k: sort_json_keys(v, reverse) for k, v in sorted(obj.items(), key=lambda x: x[0], reverse=reverse)}
+		sorted_dict = {
+		    k: sort_json_keys(v, reverse)
+		    for k, v in sorted(
+		        obj.items(), key=lambda x: x[0], reverse=reverse)
+		}
 		return cast(T, sorted_dict)
 	elif isinstance(obj, list):
 		sorted_list = [sort_json_keys(item, reverse) for item in obj]
@@ -122,7 +143,9 @@ def sort_json_keys(obj: T, reverse: bool = False) -> T:
 	else:
 		return obj
 
-def save_json(data: Union[Dict[str, Any], List[Any], str, int, float, bool], file_path: str) -> None:
+
+def save_json(data: Union[Dict[str, Any], List[Any], str, int, float, bool],
+              file_path: str) -> None:
 	"""
 	Save JSON data to a file.
 
@@ -138,7 +161,8 @@ def save_json(data: Union[Dict[str, Any], List[Any], str, int, float, bool], fil
 		with open(file_path, 'w', encoding='utf-8') as file:
 			json.dump(data, file, indent=2)
 	except IOError as e:
-		print(f"Error: Unable to write to file '{file_path}'. Error: {str(e)}")
+		log.critical(
+		    f"Error: Unable to write to file '{file_path}'. Error: {str(e)}")
 		sys.exit(1)
 	except TypeError as e:
 		raise ValueError(f"Invalid JSON data: {str(e)}")
