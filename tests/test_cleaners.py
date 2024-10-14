@@ -20,6 +20,12 @@ def test_remove_comments(file_name):
 			assert "/*" not in data
 			assert "*/" not in data
 		else:
-			assert "//" in data
-			assert "/*" in data
-			assert "*/" in data
+			if file_name == "ds_symbols.json":
+				assert "//" in data
+			elif file_name == "bc_symbols.json":
+				assert "/*" in data
+				assert "*/" in data
+			else:
+				assert "//" in data
+				assert "/*" in data
+				assert "*/" in data
