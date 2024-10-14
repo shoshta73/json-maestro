@@ -1,0 +1,20 @@
+{
+	"not-a-comment": "//",
+	"user": {
+		"id": 12345,
+		"name": "John Doe",
+		"age": 30,
+		"should-not-be-a-comment": "/*",
+
+		"email": "john.doe@example.com",
+		"isActive": true,
+
+		"socialProfiles": {
+			"linkedin": "/in/johndoe",
+			"this-is-not-block-end": "*/",
+			"twitter": "@realjohndoe",
+			"facebook": null
+		}
+	},
+	"definetly-not-a-comment": "This should not be a comment //"
+}
