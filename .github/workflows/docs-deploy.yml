@@ -1,0 +1,42 @@
+name: docs-deploy
+
+on:
+    push:
+        branches: ["master"]
+        paths:
+            - "docs/**"
+
+jobs:
+    docs-build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+            - name: Setup mdBook
+              run: |
+                  cargo install mdbook
+
+            - name: Build docs
+              run: |
+                  mdbook build
+
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v1
+              with:
+                  path: "./book"
+
+    docs-deploy:
+        needs: docs-build
+        runs-on: ubuntu-latest
+        permissions:
+            pages: write
+            id-token: write
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v2
