@@ -16,7 +16,7 @@ jobs:
 
             - name: Setup mdBook
               run: |
-                  cargo install mdbook
+                  cargo install --git https://github.com/rust-lang/mdBook.git mdbook
 
             - name: Build docs
               run: |
