@@ -45,11 +45,13 @@ jobs:
                   password: ${{ secrets.PYPI_API_TOKEN }}
 
             - name: Commit and push changes
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   git config --global user.name "GitHub Actions[bot]"
                   git config --global user.email "actions@github.com"
                   git add pyproject.toml
-                  git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+                  git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
                   git commit -m "Update version to ${{ github.ref_name }}"
                   git push
 
