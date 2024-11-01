@@ -15,7 +15,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                  branch: master
+                  ref: master
 
             - name: Set up Python
               uses: actions/setup-python@v3
@@ -55,7 +55,7 @@ jobs:
                   git add pyproject.toml
                   git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
                   git commit -m "Update version to ${{ github.ref_name }}"
-                  git push
+                  git push origin master
 
     build-docs:
         needs: deploy
